@@ -1,6 +1,6 @@
 # TinyAPI Documentation
 
-TinyAPI is a simple storage service that allows users to save and edit payloads through a RESTful API.
+TinyAPI is a simple storage service that allows users to save and edit payloads through a RESTful API. For now, it is still WIP and would support authentication based rate limits in future. 
 
 ## Authentication
 
