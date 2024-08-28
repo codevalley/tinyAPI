@@ -22,6 +22,8 @@ module Api
         else
           render json: { errors: payload.errors.full_messages }, status: :unprocessable_entity
         end
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: 'Payload not found' }, status: :not_found
       end
 
       def get
@@ -29,6 +31,8 @@ module Api
         payload.update(viewed_at: Time.current)
 
         render json: payload_response(payload)
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: 'Payload not found' }, status: :not_found
       end
 
       private

@@ -19,7 +19,7 @@ class Payload < ApplicationRecord
   end
 
   def set_default_expiry_time
-    self.expiry_time ||= Time.current + Rails.configuration.tinyapi.default_expiry_days.days
+    self.expiry_time = Time.current + Rails.configuration.tinyapi.default_expiry_days.days if expiry_time.nil?
   end
 
   def expiry_time_within_limit

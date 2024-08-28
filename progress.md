@@ -18,13 +18,17 @@
 - Removed tracked files that should be ignored
 - Used git filter-repo to remove sensitive and unnecessary files from entire Git history
 - Re-added remote origin after git filter-repo operation
+- Set up RSpec for testing
+- Created initial model tests for Payload
+- Created controller tests for PayloadsController (add, edit, get actions)
 
 ## To-Do
 - Write comprehensive tests using RSpec
   - Include model specs, controller specs, and integration tests
   - Use FactoryBot for test data generation
+- Write controller tests for PayloadsController
 - Implement error handling for database errors and not found scenarios
-- Set up Brakeman for security checks
+- Set up Rubocop for code style enforcement
 - Configure production environment
 - Implement token validation (for future versions)
 - Add more comprehensive logging

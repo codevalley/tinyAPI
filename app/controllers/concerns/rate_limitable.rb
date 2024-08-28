@@ -8,7 +8,7 @@ module RateLimitable
   private
 
   def check_rate_limit
-    limit = Rails.configuration.tinyapi.rate_limits[action_name.to_sym]
+    limit = Rails.configuration.tinyapi.rate_limits[action_name.to_sym] || 1000 # Default to 1000 if not set
     key = "rate_limit:#{request.headers['X-Client-Token']}:#{controller_name}:#{action_name}"
     count = Rails.cache.increment(key, 1, expires_in: 1.hour)
 
