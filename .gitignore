@@ -22,7 +22,7 @@
 !/tmp/pids/
 !/tmp/pids/.keep
 
-# Ignore storage (uploaded files in development and any SQLite databases).
+# Ignore uploaded files in development.
 /storage/*
 !/storage/.keep
 /tmp/storage/*
@@ -32,5 +32,47 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-# Ignore .cursorrules
+# Ignore database files
+/db/*.sqlite3
+/db/*.sqlite3-*
+
+# Ignore all .env files
+.env*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore node modules
+/node_modules
+
+# Ignore yarn files
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+# Ignore coverage reports
+/coverage
+
+# Ignore Redis dump file
+dump.rdb
+
+# Ignore RSpec state
+spec/examples.txt
+
+# Ignore public uploads
+/public/uploads
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore Ruby version file
+.ruby-version
+
+# Ignore gem lockfile
+Gemfile.lock
 .cursorrules
+files_to_remove.txt
