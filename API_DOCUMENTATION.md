@@ -60,8 +60,6 @@ Note: In v1, this token is a placeholder with no validation.
 - **Response:** Payload content and metadata
 - **Rate limit:** 1000 requests per hour per client token
 
-## Notes
+## Sample Requests
 
-- Maximum payload size: 1 MB
-- Payloads are automatically deleted when their expiry time is reached or if not viewed for 6 days
-- Expiry time is limited to a maximum set by the server configuration
+### Add Payload
