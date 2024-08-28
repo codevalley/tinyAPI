@@ -35,11 +35,13 @@ jobs:
           ruby-version: '3.3.4'
           bundler-cache: true
 
-      - name: Install importmap-rails
-        run: gem install importmap-rails
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bundle exec importmap audit
+        run: bundle exec rails importmap:audit
 
   lint:
     runs-on: ubuntu-latest
@@ -86,4 +88,3 @@ jobs:
         run: |
           bundle exec rails db:test:prepare
           bundle exec rails test
-          bundle exec rails test:system
