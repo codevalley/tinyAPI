@@ -51,5 +51,5 @@ gem "rubocop", require: false
 gem "importmap-rails"
 
 group :test do
-  gem 'simplecov', require: false
+  gem "simplecov", require: false
 end
