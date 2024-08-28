@@ -14,9 +14,10 @@
 - Updated expiry time logic to respect server-defined maximum
 - Added README.md with project overview and setup instructions
 - Added LICENSE.md with MIT License
-- Updated .gitignore file to exclude sensitive and unnecessary files
-- Removed sensitive files from Git tracking
+- Updated .gitignore to exclude all sensitive and unnecessary files
+- Removed tracked files that should be ignored
 - Used git filter-repo to remove sensitive and unnecessary files from entire Git history
+- Re-added remote origin after git filter-repo operation
 
 ## To-Do
 - Write comprehensive tests using RSpec
@@ -58,3 +59,5 @@
 - Set up Docker for consistent development and deployment environments
 - Ensure all team members pull the latest changes and update their local repositories
 - Ensure all team members clone a fresh copy of the repository after history rewrite
+- Review the repository to confirm all sensitive and unnecessary files have been removed
+- Ensure all team members update their local repositories with the new remote origin
