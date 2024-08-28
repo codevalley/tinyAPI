@@ -1,0 +1,53 @@
+# TinyAPI Progress
+
+## Completed Tasks
+- Set up Rails project with necessary gems
+- Created Payload model and migration
+- Implemented rate limiting with Redis
+- Created PayloadsController with add, edit, and get actions
+- Set up configuration for expiry times and rate limits
+- Implemented auto-delete job for expired payloads
+- Added scheduler for running the auto-delete job
+- Fixed database migration issues
+- Implemented CRUD operations with curl commands
+- Created API documentation (API_DOCUMENTATION.md)
+- Updated expiry time logic to respect server-defined maximum
+
+## To-Do
+- Write comprehensive tests using RSpec
+  - Include model specs, controller specs, and integration tests
+  - Use FactoryBot for test data generation
+- Implement error handling for database errors and not found scenarios
+- Set up Brakeman for security checks
+- Configure production environment
+- Implement token validation (for future versions)
+- Add more comprehensive logging
+- Implement pagination for large datasets
+- Consider adding a delete endpoint for manual payload removal
+- Refactor code to follow Ruby style guide (use Rubocop)
+- Optimize database queries
+  - Add necessary indexes
+  - Use includes, joins, or select to avoid N+1 queries
+- Implement caching strategies (e.g., fragment caching, Russian Doll caching)
+- Use service objects for complex business logic
+- Implement background jobs using Sidekiq for time-consuming tasks
+- Enhance security measures
+  - Implement proper authentication and authorization
+  - Use strong parameters in controllers
+  - Protect against common web vulnerabilities (XSS, CSRF, SQL injection)
+- Improve API documentation
+  - Add examples for each endpoint
+  - Include error responses and status codes
+- Set up continuous integration (CI) pipeline
+- Implement versioning for the API
+- Add monitoring and alerting for production environment
+- Optimize performance
+  - Use database indexing effectively
+  - Implement eager loading to avoid N+1 queries
+- Enhance error handling and validation
+  - Implement proper error logging
+  - Display user-friendly error messages
+- Refactor controllers to keep them skinny
+  - Move business logic to service objects or model methods
+- Implement API rate limiting using Redis
+- Set up Docker for consistent development and deployment environments
