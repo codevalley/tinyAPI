@@ -1,5 +1,8 @@
 # TinyAPI
 
+[![CI Status](https://github.com/codevalley/tinyapi/workflows/CI/badge.svg)](https://github.com/codevalley/tinyapi/actions)
+[![codecov](https://codecov.io/gh/codevalley/tinyapi/branch/main/graph/badge.svg)](https://codecov.io/gh/codevalley/tinyapi)
+
 TinyAPI is a simple storage service that allows users to save and edit payloads through a RESTful API. It's built with Ruby on Rails and uses Redis for rate limiting.
 
 ## Features

@@ -49,3 +49,7 @@ gem "rubocop", require: false
 
 # Add importmap-rails
 gem "importmap-rails"
+
+group :test do
+  gem 'simplecov', require: false
+end
