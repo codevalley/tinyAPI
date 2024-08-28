@@ -28,20 +28,22 @@
 - Configured test environment to use Redis for caching
 - Wrote integration tests for API endpoints (add, edit, get)
 - Successfully ran and passed all tests (unit, controller, and integration)
+- Implemented error handling for database errors and not found scenarios
+- Set up Rubocop for code style enforcement
+- Optimized database queries
+  - Added necessary indexes
+  - Used includes, joins, or select to avoid N+1 queries
+- Implemented caching strategies (e.g., fragment caching, Russian Doll caching)
+- Refactored code to follow Ruby style guide (used Rubocop)
+- Fixed all RuboCop offenses
+- Ensured all tests are passing after refactoring
 
 ## To-Do
-- Implement error handling for database errors and not found scenarios
-- Set up Rubocop for code style enforcement
 - Configure production environment
 - Implement token validation (for future versions)
 - Add more comprehensive logging
 - Implement pagination for large datasets
 - Consider adding a delete endpoint for manual payload removal
-- Refactor code to follow Ruby style guide (use Rubocop)
-- Optimize database queries
-  - Add necessary indexes
-  - Use includes, joins, or select to avoid N+1 queries
-- Implement caching strategies (e.g., fragment caching, Russian Doll caching)
 - Use service objects for complex business logic
 - Implement background jobs using Sidekiq for time-consuming tasks
 - Enhance security measures
@@ -54,9 +56,6 @@
 - Set up continuous integration (CI) pipeline
 - Implement versioning for the API
 - Add monitoring and alerting for production environment
-- Optimize performance
-  - Use database indexing effectively
-  - Implement eager loading to avoid N+1 queries
 - Enhance error handling and validation
   - Implement proper error logging
   - Display user-friendly error messages
