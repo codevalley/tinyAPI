@@ -1,36 +1,43 @@
 class PayloadsController < ApplicationController
-  include ErrorHandler
+  before_action :set_payload, only: [ :show, :update ]
 
-  # ... existing code ...
+  def index
+    @payloads = Payload.all
+    render json: @payloads
+  end
 
-  def add
+  def show
+    render json: @payload
+  end
+
+  def create
     @payload = Payload.new(payload_params)
+    @payload.hash_id = SecureRandom.hex(10) # Generate a unique hash_id
+
     if @payload.save
-      render json: { id: @payload.id }, status: :created
+      render json: @payload, status: :created, location: @payload
     else
-      render json: { error: @payload.errors.full_messages }, status: :unprocessable_entity
+      render json: @payload.errors, status: :unprocessable_entity
     end
   end
 
-  def edit
-    @payload = Payload.find_by!(id: params[:id])
+  def update
     if @payload.update(payload_params)
-      head :no_content
+      render json: @payload
     else
-      render json: { error: @payload.errors.full_messages }, status: :unprocessable_entity
+      render json: @payload.errors, status: :unprocessable_entity
     end
-  end
-
-  def get
-    @payload = Rails.cache.fetch("payload_#{params[:id]}", expires_in: 1.hour) do
-      Payload.find_by!(id: params[:id])
-    end
-    render json: { data: @payload.data }
   end
 
   private
 
+  def set_payload
+    @payload = Payload.find_by!(hash_id: params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Payload not found" }, status: :not_found
+  end
+
   def payload_params
-    params.require(:payload).permit(:data, :expiry)
+    params.require(:payload).permit(:content, :mime_type)
   end
 end

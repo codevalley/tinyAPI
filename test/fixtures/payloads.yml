@@ -1,0 +1,11 @@
+one:
+  hash_id: "abc123"
+  content: "Test content"
+  mime_type: "text/plain"
+  expiry_time: <%= 1.day.from_now %>
+
+two:
+  hash_id: "def456"
+  content: "Another test content"
+  mime_type: "application/json"
+  expiry_time: <%= 2.days.from_now %>

@@ -1,35 +1,50 @@
 class Payload < ApplicationRecord
-  validates :hash_id, presence: true, uniqueness: true
-  validates :content, presence: true
+  MAX_CONTENT_SIZE = 10.megabytes
+  MAX_EXPIRY_TIME = 30.days
+
+  attr_accessor :skip_callbacks
+
+  validates :content, presence: true, length: { maximum: MAX_CONTENT_SIZE }
   validates :mime_type, presence: true
-  validates :expiry_time, presence: true
+  validates :hash_id, presence: true, uniqueness: true
   validate :content_size_within_limit
   validate :expiry_time_within_limit
 
-  before_validation :set_default_expiry_time, on: :create
-  before_save :sanitize_content
+  before_validation :set_default_values, unless: :skip_callbacks
 
   private
 
-  def content_size_within_limit
-    return unless content.present?
-
-    max_size = Rails.configuration.tinyapi.max_payload_size
-    errors.add(:content, "size exceeds the limit of #{max_size} bytes") if content.bytesize > max_size
+  def set_default_values
+    set_default_mime_type
+    set_hash_id
+    set_expiry_time
   end
 
-  def set_default_expiry_time
-    self.expiry_time ||= Time.current + Rails.configuration.tinyapi.default_expiry_days.days
+  def set_default_mime_type
+    self.mime_type ||= "text/plain"
+  end
+
+  def set_hash_id
+    self.hash_id ||= SecureRandom.hex(10)
+  end
+
+  def set_expiry_time
+    self.expiry_time ||= MAX_EXPIRY_TIME.from_now
+  end
+
+  def content_size_within_limit
+    return if content.blank?
+
+    if content.bytesize > MAX_CONTENT_SIZE
+      errors.add(:content, "size exceeds the limit of #{MAX_CONTENT_SIZE} bytes")
+    end
   end
 
   def expiry_time_within_limit
-    return unless expiry_time.present?
+    return if expiry_time.blank?
 
-    max_expiry = Time.current + Rails.configuration.tinyapi.max_expiry_days.days
-    self.expiry_time = [ expiry_time, max_expiry ].min
-  end
-
-  def sanitize_content
-    self.content = ActionController::Base.helpers.sanitize(content)
+    if expiry_time > MAX_EXPIRY_TIME.from_now
+      self.expiry_time = MAX_EXPIRY_TIME.from_now
+    end
   end
 end

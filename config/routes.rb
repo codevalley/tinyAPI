@@ -15,4 +15,6 @@ Rails.application.routes.draw do
       get "get/:hash_id", to: "payloads#get"
     end
   end
+
+  resources :payloads, only: [ :index, :show, :create, :update ]
 end

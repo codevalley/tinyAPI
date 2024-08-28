@@ -2,63 +2,69 @@ require "rails_helper"
 
 RSpec.describe Payload, type: :model do
   describe "validations" do
-    subject { build(:payload, expiry_time: nil) }
+    subject { Payload.new(content: "Test content") }
 
-    it { should validate_presence_of(:hash_id) }
-    it { should validate_uniqueness_of(:hash_id) }
     it { should validate_presence_of(:content) }
-    it { should validate_presence_of(:mime_type) }
 
-    it "sets a default expiry_time if not provided" do
-      expect(subject.expiry_time).to be_nil
-      subject.valid?
-      expected_expiry = Time.current + Rails.configuration.tinyapi.default_expiry_days.days
-      expect(subject.expiry_time).to be_within(1.second).of(expected_expiry)
+    it "validates presence of hash_id" do
+      payload = Payload.new(content: "Test content", skip_callbacks: true)
+      expect(payload).to be_invalid
+      expect(payload.errors[:hash_id]).to include("can't be blank")
     end
 
-    it "sets the expiry_time to the default if not provided" do
-      subject.save
-      expected_expiry = Time.current + Rails.configuration.tinyapi.default_expiry_days.days
-      expect(subject.expiry_time).to be_within(1.second).of(expected_expiry)
+    it "validates presence of mime_type" do
+      payload = Payload.new(content: "Test content", skip_callbacks: true)
+      expect(payload).to be_invalid
+      expect(payload.errors[:mime_type]).to include("can't be blank")
+    end
+
+    it { should validate_uniqueness_of(:hash_id) }
+
+    it "sets a default mime_type if not provided" do
+      payload = Payload.new(content: "Test content")
+      payload.valid?
+      expect(payload.mime_type).to eq("text/plain")
+    end
+
+    it "sets a default hash_id if not provided" do
+      payload = Payload.new(content: "Test content")
+      payload.valid?
+      expect(payload.hash_id).to be_present
+    end
+
+    it "sets a default expiry_time if not provided" do
+      payload = Payload.new(content: "Test content")
+      payload.valid?
+      expect(payload.expiry_time).to be_within(1.second).of(30.days.from_now)
     end
   end
 
   describe "content_size_within_limit" do
-    let(:payload) { build(:payload, content: "a" * (Rails.configuration.tinyapi.max_payload_size + 1)) }
-
     it "is invalid when content size exceeds the limit" do
-      expect(payload).to be_invalid
-      max_size = Rails.configuration.tinyapi.max_payload_size
-      error_message = "size exceeds the limit of #{max_size} bytes"
-      expect(payload.errors[:content]).to include(error_message)
+      payload = Payload.new(content: "a" * (Payload::MAX_CONTENT_SIZE + 1))
+      payload.valid?
+      expect(payload.errors[:content]).to include("size exceeds the limit of #{Payload::MAX_CONTENT_SIZE} bytes")
     end
 
-    it "validates the content size" do
-      max_size = Rails.configuration.tinyapi.max_payload_size
-      payload.content = "a" * (max_size + 1)
-      expect(payload).to be_invalid
-      error_message = "size exceeds the limit of #{max_size} bytes"
-      expect(payload.errors[:content]).to include(error_message)
+    it "is valid when content size is within the limit" do
+      payload = Payload.new(content: "a" * Payload::MAX_CONTENT_SIZE)
+      payload.valid?
+      expect(payload.errors[:content]).to be_empty
     end
   end
 
   describe "expiry_time_within_limit" do
-    let(:payload) do
-      build(:payload,
-            expiry_time: Time.current + (Rails.configuration.tinyapi.max_expiry_days + 1).days)
-    end
-
     it "sets expiry_time to the maximum allowed when it exceeds the limit" do
+      payload = Payload.new(content: "Test", expiry_time: 31.days.from_now)
       payload.valid?
-      max_expiry = Time.current + Rails.configuration.tinyapi.max_expiry_days.days
-      expect(payload.expiry_time).to be_within(1.second).of(max_expiry)
+      expect(payload.expiry_time).to be_within(1.second).of(30.days.from_now)
     end
 
-    it "limits the expiry_time to the maximum allowed" do
-      max_expiry = Time.current + Rails.configuration.tinyapi.max_expiry_days.days
-      payload.expiry_time = max_expiry + 1.day
-      payload.save
-      expect(payload.expiry_time).to be_within(1.second).of(max_expiry)
+    it "does not change expiry_time when it's within the limit" do
+      expiry_time = 29.days.from_now
+      payload = Payload.new(content: "Test", expiry_time: expiry_time)
+      payload.valid?
+      expect(payload.expiry_time).to be_within(1.second).of(expiry_time)
     end
   end
 end
