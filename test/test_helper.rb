@@ -1,5 +1,10 @@
 require "simplecov"
-SimpleCov.start "rails"
+require "simplecov-cobertura"
+
+SimpleCov.start "rails" do
+  enable_coverage :branch
+  formatter SimpleCov::Formatter::CoberturaFormatter
+end
 
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
