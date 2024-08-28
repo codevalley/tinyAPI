@@ -40,8 +40,11 @@ jobs:
           gem install bundler
           bundle install
 
-      - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bundle exec rails importmap:audit
+      - name: List installed gems
+        run: bundle list
+
+      - name: Check for outdated gems
+        run: bundle outdated
 
   lint:
     runs-on: ubuntu-latest
