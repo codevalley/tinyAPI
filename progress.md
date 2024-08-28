@@ -21,12 +21,15 @@
 - Set up RSpec for testing
 - Created initial model tests for Payload
 - Created controller tests for PayloadsController (add, edit, get actions)
+- Implemented comprehensive tests using RSpec
+  - Included model specs and controller specs
+  - Used FactoryBot for test data generation
+- Fixed issues with rate limiting in tests
+- Configured test environment to use Redis for caching
+- Wrote integration tests for API endpoints (add, edit, get)
+- Successfully ran and passed all tests (unit, controller, and integration)
 
 ## To-Do
-- Write comprehensive tests using RSpec
-  - Include model specs, controller specs, and integration tests
-  - Use FactoryBot for test data generation
-- Write controller tests for PayloadsController
 - Implement error handling for database errors and not found scenarios
 - Set up Rubocop for code style enforcement
 - Configure production environment
@@ -59,9 +62,5 @@
   - Display user-friendly error messages
 - Refactor controllers to keep them skinny
   - Move business logic to service objects or model methods
-- Implement API rate limiting using Redis
 - Set up Docker for consistent development and deployment environments
 - Ensure all team members pull the latest changes and update their local repositories
-- Ensure all team members clone a fresh copy of the repository after history rewrite
-- Review the repository to confirm all sensitive and unnecessary files have been removed
-- Ensure all team members update their local repositories with the new remote origin
