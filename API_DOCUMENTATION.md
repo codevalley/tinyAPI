@@ -13,52 +13,23 @@ Note: In v1, this token is a placeholder with no validation.
 
 ### 1. Add Payload
 
-- **URL:** `/api/v1/add`
-- **Method:** POST
-- **Headers:**
-  - Content-Type: application/json
-  - X-Client-Token: <your_client_token>
-- **Body:**
-  ```json
-  {
+  ```bash
+  curl -X POST http://localhost:3000/api/v1/add \
+  -H "Content-Type: application/json" \
+  -H "X-Client-Token: surface_token" \
+  -d '{
     "payload": {
-      "content": "Your content here",
+      "content": "Hello, world!",
       "mime_type": "text/plain",
-      "expiry_time": "YYYY-MM-DDTHH:MM:SSZ"
+      "expiry_time": "2024-01-01T00:00:00Z"
     }
-  }
+  }'
   ```
-- **Response:** JSON with hash_id, created_at timestamp, and other metadata
-- **Rate limit:** 100 requests per hour per client token
+### 2. Get Payload
 
-### 2. Edit Payload
-
-- **URL:** `/api/v1/edit/:hash_id`
-- **Method:** PUT
-- **Headers:**
-  - Content-Type: application/json
-  - X-Client-Token: <your_client_token>
-- **Body:**
-  ```json
-  {
-    "payload": {
-      "content": "Your updated content here",
-      "mime_type": "text/plain",
-      "expiry_time": "YYYY-MM-DDTHH:MM:SSZ"
-    }
-  }
+  ```bash
+  curl -X GET http://localhost:3000/api/v1/get/540331c86f1f77f9ff53   -H "X-Client-Token: surface_curl"
   ```
-- **Response:** Updated metadata
-- **Rate limit:** 200 requests per hour per client token
-
-### 3. Get Payload
-
-- **URL:** `/api/v1/get/:hash_id`
-- **Method:** GET
-- **Headers:**
-  - X-Client-Token: <your_client_token>
-- **Response:** Payload content and metadata
-- **Rate limit:** 1000 requests per hour per client token
 
 ## Sample Requests
 
