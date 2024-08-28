@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe "Api::V1::Payloads", type: :request do
   let(:valid_headers) {
@@ -15,7 +15,7 @@ RSpec.describe "Api::V1::Payloads", type: :request do
         expect {
           post "/api/v1/add", params: valid_attributes.to_json, headers: valid_headers
         }.to change(Payload, :count).by(1)
-        
+
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
@@ -26,7 +26,7 @@ RSpec.describe "Api::V1::Payloads", type: :request do
         expect {
           post "/api/v1/add", params: { payload: { content: "" } }.to_json, headers: valid_headers
         }.to change(Payload, :count).by(0)
-        
+
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
@@ -38,8 +38,8 @@ RSpec.describe "Api::V1::Payloads", type: :request do
 
     context "with valid parameters" do
       it "updates the requested payload" do
-        put "/api/v1/edit/#{payload.hash_id}", 
-            params: { payload: { content: "Updated content" } }.to_json, 
+        put "/api/v1/edit/#{payload.hash_id}",
+            params: { payload: { content: "Updated content" } }.to_json,
             headers: valid_headers
 
         payload.reload
@@ -51,8 +51,8 @@ RSpec.describe "Api::V1::Payloads", type: :request do
 
     context "with invalid parameters" do
       it "renders a JSON response with errors" do
-        put "/api/v1/edit/#{payload.hash_id}", 
-            params: { payload: { content: "" } }.to_json, 
+        put "/api/v1/edit/#{payload.hash_id}",
+            params: { payload: { content: "" } }.to_json,
             headers: valid_headers
 
         expect(response).to have_http_status(:unprocessable_entity)

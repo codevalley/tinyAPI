@@ -10,9 +10,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      post 'add', to: 'payloads#add'
-      put 'edit/:hash_id', to: 'payloads#edit'
-      get 'get/:hash_id', to: 'payloads#get'
+      post "add", to: "payloads#add"
+      put "edit/:hash_id", to: "payloads#edit"
+      get "get/:hash_id", to: "payloads#get"
     end
   end
 end

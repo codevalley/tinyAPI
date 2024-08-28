@@ -43,4 +43,4 @@ group :development do
   gem "rubocop-rails-omakase", require: false
 end
 
-
+gem "rubocop", require: false

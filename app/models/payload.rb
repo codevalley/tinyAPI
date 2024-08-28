@@ -19,14 +19,14 @@ class Payload < ApplicationRecord
   end
 
   def set_default_expiry_time
-    self.expiry_time = Time.current + Rails.configuration.tinyapi.default_expiry_days.days if expiry_time.nil?
+    self.expiry_time ||= Time.current + Rails.configuration.tinyapi.default_expiry_days.days
   end
 
   def expiry_time_within_limit
     return unless expiry_time.present?
 
-    max_expiry = Time.current + Rails.configuration.tinyapi.default_expiry_days.days
-    self.expiry_time = [expiry_time, max_expiry].min
+    max_expiry = Time.current + Rails.configuration.tinyapi.max_expiry_days.days
+    self.expiry_time = [ expiry_time, max_expiry ].min
   end
 
   def sanitize_content
