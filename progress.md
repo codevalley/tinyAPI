@@ -12,6 +12,8 @@
 - Implemented CRUD operations with curl commands
 - Created API documentation (API_DOCUMENTATION.md)
 - Updated expiry time logic to respect server-defined maximum
+- Added README.md with project overview and setup instructions
+- Added LICENSE.md with MIT License
 
 ## To-Do
 - Write comprehensive tests using RSpec

@@ -1,24 +1,58 @@
-# README
+# TinyAPI
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+TinyAPI is a simple storage service that allows users to save and edit payloads through a RESTful API. It's built with Ruby on Rails and uses Redis for rate limiting.
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- Create, read, and update payloads
+- Automatic payload expiration
+- Rate limiting
+- Configurable payload size and expiry time
 
-* System dependencies
+## Getting Started
 
-* Configuration
+### Prerequisites
 
-* Database creation
+- Ruby 3.x
+- Rails 7.2.1
+- Redis
 
-* Database initialization
+### Installation
 
-* How to run the test suite
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/tinyapi.git
+   cd tinyapi
+   ```
 
-* Services (job queues, cache servers, search engines, etc.)
+2. Install dependencies:
+   ```bash
+   bundle install
+   ```
 
-* Deployment instructions
+3. Set up the database:
+   ```bash
+   rails db:create db:migrate
+   ```
 
-* ...
+4. Start the Redis server:
+   ```bash
+   redis-server
+   ```
+
+5. Start the Rails server:
+   ```bash
+   rails server
+   ```
+
+## Usage
+
+See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for detailed API usage instructions.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
