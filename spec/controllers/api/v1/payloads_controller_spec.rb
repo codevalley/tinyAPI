@@ -13,18 +13,18 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     { "X-Client-Token" => "test_token" }
   }
 
-  describe "POST #add" do
+  describe "POST #create" do
     context "with valid params" do
       it "creates a new Payload" do
         expect {
           request.headers.merge!(valid_headers)
-          post :add, params: { payload: valid_attributes }
+          post :create, params: { payload: valid_attributes }
         }.to change(Payload, :count).by(1)
       end
 
       it "renders a JSON response with the new payload" do
         request.headers.merge!(valid_headers)
-        post :add, params: { payload: valid_attributes }
+        post :create, params: { payload: valid_attributes }
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to include("hash_id", "content", "mime_type", "expiry_time")
@@ -34,7 +34,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     context "with invalid params" do
       it "renders a JSON response with errors" do
         request.headers.merge!(valid_headers)
-        post :add, params: { payload: invalid_attributes }
+        post :create, params: { payload: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("errors")
@@ -42,7 +42,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     end
   end
 
-  describe "PUT #edit" do
+  describe "PUT #update" do
     let!(:payload) { create(:payload) }
 
     context "with valid params" do
@@ -52,14 +52,14 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
 
       it "updates the requested payload" do
         request.headers.merge!(valid_headers)
-        put :edit, params: { hash_id: payload.hash_id, payload: new_attributes }
+        put :update, params: { hash_id: payload.hash_id, payload: new_attributes }
         payload.reload
         expect(payload.content).to eq("Updated content")
       end
 
       it "renders a JSON response with the payload" do
         request.headers.merge!(valid_headers)
-        put :edit, params: { hash_id: payload.hash_id, payload: new_attributes }
+        put :update, params: { hash_id: payload.hash_id, payload: new_attributes }
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)["content"]).to eq("Updated content")
@@ -69,20 +69,30 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     context "with invalid params" do
       it "renders a JSON response with errors" do
         request.headers.merge!(valid_headers)
-        put :edit, params: { hash_id: payload.hash_id, payload: invalid_attributes }
+        put :update, params: { hash_id: payload.hash_id, payload: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("errors")
       end
     end
+
+    context "with non-existent payload" do
+      it "renders a JSON response with a not found error" do
+        request.headers.merge!(valid_headers)
+        put :update, params: { hash_id: "non_existent", payload: valid_attributes }
+        expect(response).to have_http_status(:not_found)
+        expect(response.content_type).to eq("application/json; charset=utf-8")
+        expect(JSON.parse(response.body)).to have_key("error")
+      end
+    end
   end
 
-  describe "GET #get" do
+  describe "GET #show" do
     let!(:payload) { create(:payload) }
 
     it "renders a JSON response with the payload" do
       request.headers.merge!(valid_headers)
-      get :get, params: { hash_id: payload.hash_id }
+      get :show, params: { hash_id: payload.hash_id }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("application/json; charset=utf-8")
       expect(JSON.parse(response.body)).to include("hash_id", "content", "mime_type", "expiry_time")
@@ -91,7 +101,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     it "updates the viewed_at timestamp" do
       expect {
         request.headers.merge!(valid_headers)
-        get :get, params: { hash_id: payload.hash_id }
+        get :show, params: { hash_id: payload.hash_id }
         payload.reload
       }.to change(payload, :viewed_at)
     end
@@ -99,7 +109,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     context "when payload doesn't exist" do
       it "renders a JSON response with errors" do
         request.headers.merge!(valid_headers)
-        get :get, params: { hash_id: "nonexistent" }
+        get :show, params: { hash_id: "nonexistent" }
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("error")

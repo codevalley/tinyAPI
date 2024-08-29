@@ -3,7 +3,7 @@ module Api
     class PayloadsController < ApplicationController
       include RateLimitable
 
-      def add
+      def create
         payload = Payload.new(payload_params)
         payload.hash_id = SecureRandom.hex(10)
 
@@ -14,7 +14,7 @@ module Api
         end
       end
 
-      def edit
+      def update
         payload = Payload.find_by!(hash_id: params[:hash_id])
 
         if payload.update(payload_params)
@@ -26,7 +26,7 @@ module Api
         render json: { error: "Payload not found" }, status: :not_found
       end
 
-      def get
+      def show
         payload = Payload.find_by!(hash_id: params[:hash_id])
         payload.update(viewed_at: Time.current)
 

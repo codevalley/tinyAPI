@@ -37,29 +37,39 @@
 - Refactored code to follow Ruby style guide (used Rubocop)
 - Fixed all RuboCop offenses
 - Ensured all tests are passing after refactoring
+- Implemented API versioning (v1)
+- Updated routes to use RESTful conventions
+- Refactored PayloadsController to use create, update, and show actions
+- Updated tests to match new API structure and conventions
+- Fixed issues with update action in controller and tests
+- Ensured all tests are passing after refactoring
+- Updated API documentation to reflect new versioned endpoints
+- Implemented comprehensive error handling in controller actions
+- Added tests for non-existent payload scenarios
+- Configured CI pipeline with GitHub Actions
+- Set up linting with RuboCop in CI pipeline
+- Implemented test coverage reporting
 
 ## To-Do
-- Configure production environment
-- Implement token validation (for future versions)
-- Add more comprehensive logging
-- Implement pagination for large datasets
-- Consider adding a delete endpoint for manual payload removal
-- Use service objects for complex business logic
-- Implement background jobs using Sidekiq for time-consuming tasks
-- Enhance security measures
-  - Implement proper authentication and authorization
-  - Use strong parameters in controllers
-  - Protect against common web vulnerabilities (XSS, CSRF, SQL injection)
-- Improve API documentation
-  - Add examples for each endpoint
-  - Include error responses and status codes
-- Set up continuous integration (CI) pipeline
-- Implement versioning for the API
+- Improve API documentation further
+  - Add more detailed examples for each endpoint
+  - Include error responses and status codes for all scenarios
+- Implement versioning for the API (future versions)
 - Add monitoring and alerting for production environment
 - Enhance error handling and validation
   - Implement proper error logging
   - Display user-friendly error messages
 - Refactor controllers to keep them skinny
   - Move business logic to service objects or model methods
+- Add more comprehensive logging
+- Implement pagination for large datasets
+- Consider adding a delete endpoint for manual payload removal
+- Use service objects for complex business logic
+- Implement background jobs using Sidekiq for time-consuming tasks
 - Set up Docker for consistent development and deployment environments
-- Ensure all team members pull the latest changes and update their local repositories
+- Configure production environment
+- Implement token validation (for future versions)
+- Enhance security measures
+  - Implement proper authentication and authorization
+  - Use strong parameters in controllers
+  - Protect against common web vulnerabilities (XSS, CSRF, SQL injection)
