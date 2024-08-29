@@ -16,9 +16,11 @@ TinyAPI is a simple storage service that allows users to save and edit payloads 
 
 ### Prerequisites
 
-- Ruby 3.x
+- Ruby 3.3.4
 - Rails 7.2.1
 - Redis
+- Docker
+- Kamal
 
 ### Installation
 
@@ -47,6 +49,49 @@ TinyAPI is a simple storage service that allows users to save and edit payloads 
    ```bash
    rails server
    ```
+
+## Deployment
+
+This project uses Kamal for deployment. Follow these steps to deploy:
+
+1. Ensure you have Kamal installed:
+   ```bash
+   gem install kamal
+   ```
+
+2. Set up your `.env` file with the necessary environment variables (see `.env.example` for required variables).
+
+3. Build and push your Docker image:
+   ```bash
+   docker build -t your-docker-hub-username/tinyapi:latest .
+   docker push your-docker-hub-username/tinyapi:latest
+   ```
+
+4. Deploy your application:
+   ```bash
+   kamal setup
+   kamal deploy
+   ```
+
+## Deployment Configuration
+
+The main deployment configuration is in `config/deploy.yml`. This file defines:
+
+- The Docker image to use
+- The server(s) to deploy to
+- Environment variables
+- Accessory services (like Redis)
+- Traefik configuration for SSL
+
+## Deployment Hooks
+
+Sample Kamal deployment hooks are available in the `.kamal/hooks` directory. To use a hook:
+
+1. Copy the relevant `.sample` file in the `.kamal/hooks` directory.
+2. Remove the `.sample` extension from the copied file.
+3. Modify the hook as needed for your deployment process.
+
+Note: Active hook files (without the `.sample` extension) are gitignored to prevent committing sensitive information.
 
 ## Usage
 

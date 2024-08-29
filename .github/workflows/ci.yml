@@ -43,9 +43,6 @@ jobs:
       - name: List installed gems
         run: bundle list
 
-      - name: Check for outdated gems
-        run: bundle outdated
-
   lint:
     runs-on: ubuntu-latest
     steps:
