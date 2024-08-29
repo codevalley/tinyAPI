@@ -72,7 +72,6 @@ spec/examples.txt
 # Ignore Ruby version file
 .ruby-version
 
-# Ignore gem lockfile
-Gemfile.lock
+# Ignore `
 .cursorrules
 files_to_remove.txt
