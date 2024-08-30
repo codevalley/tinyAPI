@@ -71,6 +71,10 @@ RSpec.configure do |config|
     # This will use FakeRedis for all Redis operations in tests
     Redis.instance_variable_set(:@data, Redis.new)
   end
+
+  config.before(:each, type: :job) do
+    ActiveJob::Base.queue_adapter = :test
+  end
 end
 
 # Configure Shoulda Matchers

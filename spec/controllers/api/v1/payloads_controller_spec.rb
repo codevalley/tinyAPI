@@ -1,14 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Api::V1::PayloadsController, type: :controller do
-  let(:valid_attributes) {
-    { content: "Test content", mime_type: "text/plain", expiry_time: 1.day.from_now }
-  }
-
-  let(:invalid_attributes) {
-    { content: "", mime_type: "", expiry_time: nil }
-  }
-
+  let(:valid_attributes) { { content: "Test content", mime_type: "text/plain", expiry_time: 1.day.from_now } }
+  let(:invalid_attributes) { { content: "", mime_type: "", expiry_time: nil } }
   let(:valid_headers) { { "X-Client-Token" => "test-token" } }
 
   before do
@@ -37,6 +31,14 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("errors")
+      end
+    end
+
+    context "without client token" do
+      it "returns unauthorized" do
+        request.env.delete("HTTP_X_CLIENT_TOKEN")
+        post :create, params: { payload: "Test payload" }
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
@@ -72,7 +74,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
 
     context "with non-existent payload" do
       it "renders a JSON response with a not found error" do
-        put :update, params: { hash_id: "non_existent", payload: valid_attributes }
+        put :update, params: { hash_id: "non-existent", payload: valid_attributes }
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("errors")
@@ -94,12 +96,12 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
       expect {
         get :show, params: { hash_id: payload.hash_id }
         payload.reload
-      }.to change(payload, :viewed_at).from(nil)
+      }.to change(payload, :viewed_at)
     end
 
-    context "when payload doesn't exist" do
-      it "renders a JSON response with errors" do
-        get :show, params: { hash_id: "nonexistent" }
+    context "with non-existent payload" do
+      it "renders a JSON response with a not found error" do
+        get :show, params: { hash_id: "non-existent" }
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to eq("application/json; charset=utf-8")
         expect(JSON.parse(response.body)).to have_key("errors")
