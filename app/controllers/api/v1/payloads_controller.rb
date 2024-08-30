@@ -3,54 +3,44 @@ module Api
     class PayloadsController < ApplicationController
       include RateLimitable
 
-      def create
-        payload = Payload.new(payload_params)
-        payload.hash_id = SecureRandom.hex(10)
+      before_action :set_client_token
 
-        if payload.save
-          render json: payload_response(payload), status: :created
-        else
-          render json: { errors: payload.errors.full_messages }, status: :unprocessable_entity
-        end
+      def create
+        @payload = PayloadService.create(payload_params, @client_token)
+        render json: @payload, status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render_error(e.message, :unprocessable_entity)
       end
 
       def update
-        payload = Payload.find_by!(hash_id: params[:hash_id])
-
-        if payload.update(payload_params)
-          render json: payload_response(payload)
-        else
-          render json: { errors: payload.errors.full_messages }, status: :unprocessable_entity
-        end
+        @payload = PayloadService.update(params[:hash_id], payload_params, @client_token)
+        render json: @payload
       rescue ActiveRecord::RecordNotFound
-        render json: { error: "Payload not found" }, status: :not_found
+        render_error("Payload not found", :not_found)
+      rescue ActiveRecord::RecordInvalid => e
+        render_error(e.message, :unprocessable_entity)
       end
 
       def show
-        payload = Payload.find_by!(hash_id: params[:hash_id])
-        payload.update(viewed_at: Time.current)
-
-        render json: payload_response(payload)
+        @payload = PayloadService.find(params[:hash_id], @client_token)
+        render json: @payload
       rescue ActiveRecord::RecordNotFound
-        render json: { error: "Payload not found" }, status: :not_found
+        render_error("Payload not found", :not_found)
       end
 
       private
 
       def payload_params
-        params.require(:payload).permit(:content, :mime_type, :expiry_time)
+        params.require(:payload).permit(:content, :expiry_time)
       end
 
-      def payload_response(payload)
-        {
-          hash_id: payload.hash_id,
-          content: payload.content,
-          mime_type: payload.mime_type,
-          created_at: payload.created_at,
-          updated_at: payload.updated_at,
-          viewed_at: payload.viewed_at,
-          expiry_time: payload.expiry_time
-        }
+      def set_client_token
+        @client_token = request.headers["X-Client-Token"]
+        render_error("Missing client token", :unauthorized) unless @client_token
+      end
+
+      def render_error(message, status)
+        render json: { errors: [ message ] }, status: status
       end
     end
   end

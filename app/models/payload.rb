@@ -3,14 +3,25 @@ class Payload < ApplicationRecord
   MAX_EXPIRY_TIME = 30.days
 
   attr_accessor :skip_callbacks
+  attr_accessor :client_token
 
-  validates :content, presence: true, length: { maximum: MAX_CONTENT_SIZE }
+  validates :content, presence: true
   validates :mime_type, presence: true
   validates :hash_id, presence: true, uniqueness: true
+  # Remove the client_token validation
+  # validates :client_token, presence: true
   validate :content_size_within_limit
   validate :expiry_time_within_limit
 
   before_validation :set_default_values, unless: :skip_callbacks
+
+  def viewed_at
+    self[:viewed_at]
+  end
+
+  def viewed_at=(value)
+    self[:viewed_at] = value
+  end
 
   private
 

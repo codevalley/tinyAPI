@@ -67,4 +67,11 @@ RSpec.describe Payload, type: :model do
       expect(payload.expiry_time).to be_within(1.second).of(expiry_time)
     end
   end
+
+  it "can set and get viewed_at" do
+    payload = create(:payload)
+    time = Time.current
+    payload.viewed_at = time
+    expect(payload.viewed_at).to be_within(1.second).of(time)
+  end
 end

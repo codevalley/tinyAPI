@@ -10,11 +10,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :payloads, param: :hash_id, only: [ :create, :update, :show ] do
-        collection do
-          get ":hash_id", to: "payloads#show"
-        end
-      end
+      resources :payloads, only: [ :create, :update, :show ], param: :hash_id
     end
   end
 

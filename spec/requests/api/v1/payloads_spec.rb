@@ -10,7 +10,7 @@ RSpec.describe "Api::V1::Payloads", type: :request do
   }
 
   let(:valid_headers) {
-    { "X-Client-Token" => "test_token", "CONTENT_TYPE" => "application/json" }
+    { "X-Client-Token" => "test-token", "CONTENT_TYPE" => "application/json" }
   }
 
   describe "POST /api/v1/payloads" do
@@ -25,14 +25,16 @@ RSpec.describe "Api::V1::Payloads", type: :request do
 
     context "with invalid parameters" do
       it "does not create a new Payload" do
-        post api_v1_payloads_path, params: { payload: invalid_attributes }.to_json, headers: valid_headers
+        expect {
+          post api_v1_payloads_path, params: { payload: invalid_attributes }.to_json, headers: valid_headers
+        }.to change(Payload, :count).by(0)
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
 
   describe "PUT /api/v1/payloads/:hash_id" do
-    let!(:payload) { create(:payload) }
+    let!(:payload) { create(:payload, client_token: "test-token") }
 
     context "with valid parameters" do
       let(:new_attributes) { { content: "Updated content" } }
@@ -62,7 +64,7 @@ headers: valid_headers
   end
 
   describe "GET /api/v1/payloads/:hash_id" do
-    let!(:payload) { create(:payload) }
+    let!(:payload) { create(:payload, client_token: "test-token") }
 
     it "renders a successful response" do
       get api_v1_payload_path(payload.hash_id), headers: valid_headers
@@ -73,7 +75,7 @@ headers: valid_headers
       expect {
         get api_v1_payload_path(payload.hash_id), headers: valid_headers
         payload.reload
-      }.to change(payload, :viewed_at)
+      }.to change(payload, :viewed_at).from(nil)
     end
   end
 end

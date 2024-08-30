@@ -8,17 +8,10 @@ module RateLimitable
   private
 
   def check_rate_limit
-    return if Rails.env.test? && ENV["DISABLE_RATE_LIMIT"]
-    return unless REDIS # Skip rate limiting if Redis is not available
-
-    client_token = request.headers["X-Client-Token"]
-    action = "#{controller_name}##{action_name}"
-    key = "rate_limit:#{client_token}:#{action}"
-    limit = rate_limit_for_action(action)
-
+    key = "rate_limit:#{request.ip}:#{controller_name}:#{action_name}"
     count = REDIS.get(key).to_i
 
-    if count >= limit
+    if count >= rate_limit
       render json: { error: "Rate limit exceeded" }, status: :too_many_requests
     else
       REDIS.multi do
@@ -26,22 +19,18 @@ module RateLimitable
         REDIS.expire(key, 1.hour.to_i)
       end
     end
-  rescue Redis::BaseError => e
-    Rails.logger.error "Redis error in rate limiting: #{e.message}"
-    # Optionally, you can choose to skip rate limiting on Redis errors
-    # or implement a fallback strategy
   end
 
-  def rate_limit_for_action(action)
-    case action
-    when "payloads#create"
+  def rate_limit
+    case action_name.to_sym
+    when :create
       100
-    when "payloads#update"
+    when :update
       200
-    when "payloads#show"
+    when :show
       1000
     else
-      50 # Default limit
+      50 # Default rate limit
     end
   end
 end
