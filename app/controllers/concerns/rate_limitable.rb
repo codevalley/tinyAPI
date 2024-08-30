@@ -8,7 +8,7 @@ module RateLimitable
   private
 
   def check_rate_limit
-    return if Rails.env.test? || ENV["DISABLE_RATE_LIMIT"]
+    return if ENV["DISABLE_RATE_LIMIT"]
     return unless REDIS # Skip rate limiting if Redis is not available
 
     client_token = request.headers["X-Client-Token"]

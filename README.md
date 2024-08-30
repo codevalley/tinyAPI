@@ -49,7 +49,15 @@ TinyAPI is a simple storage service that allows users to save and edit payloads 
    ```bash
    rails server
    ```
+## Testing
 
+Before any deployment, I prefer to run the below commands, to ensure everything is working fine.
+```bash
+rubocop -A # check lint enforcement
+bundle exec rspec # check test coverage
+bundle exec rails test # check unit test coverage
+rails server # to locally start the server
+```
 ## Deployment
 
 This project uses Kamal for deployment. Follow these steps to deploy:

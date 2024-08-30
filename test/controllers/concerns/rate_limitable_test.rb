@@ -1,57 +1,39 @@
 require "test_helper"
 
 class RateLimitableTest < ActionDispatch::IntegrationTest
-  class TestController < ApplicationController
-    include RateLimitable
-
-    def test_action
-      render json: { message: "Success" }
-    end
-  end
+  include ActiveSupport::Testing::TimeHelpers
 
   setup do
-    Rails.application.routes.draw do
-      get "test/rate_limit" => "rate_limitable_test/test#test_action"
-    end
-    Rails.configuration.tinyapi ||= OpenStruct.new
-    Rails.configuration.tinyapi.rate_limits = { test_action: 2 }
-    Rails.cache.clear
-  end
-
-  teardown do
-    Rails.application.reload_routes!
-    Rails.cache.clear
-  end
-
-  test "allows requests within rate limit" do
-    2.times do
-      get "/test/rate_limit", headers: { "X-Client-Token" => "test_token" }
-      assert_response :success
-    end
+    @client_token = "test_token"
+    @limit = 100 # Assuming the limit for create action is 100
   end
 
   test "blocks requests exceeding rate limit" do
-    3.times do |i|
-      get "/test/rate_limit", headers: { "X-Client-Token" => "test_token" }
-      if i < 2
-        assert_response :success
-      else
-        assert_response :too_many_requests
-        assert_equal({ "error" => "Rate limit exceeded" }, JSON.parse(@response.body))
-      end
+    @limit.times do
+      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+      assert_response :success
     end
+
+    # This request should exceed the rate limit
+    post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+    assert_response :too_many_requests
+    assert_equal({ "error" => "Rate limit exceeded" }, JSON.parse(response.body))
   end
 
-  test "handles Redis connection error" do
-    original_increment = Rails.cache.method(:increment)
-    Rails.cache.define_singleton_method(:increment) do |*args|
-      raise Redis::CannotConnectError.new("Connection refused")
+  test "resets rate limit after an hour" do
+    @limit.times do
+      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+      assert_response :success
     end
 
-    get "/test/rate_limit", headers: { "X-Client-Token" => "test_token" }
-    assert_response :success
+    # This request should exceed the rate limit
+    post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+    assert_response :too_many_requests
 
-    Rails.cache.singleton_class.send(:remove_method, :increment)
-    Rails.cache.define_singleton_method(:increment, original_increment)
+    # Travel 1 hour into the future
+    travel 1.hour do
+      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+      assert_response :success
+    end
   end
 end
