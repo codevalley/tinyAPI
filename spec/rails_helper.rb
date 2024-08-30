@@ -65,6 +65,13 @@ RSpec.configure do |config|
 
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
+
+  config.before(:each) do
+    allow(REDIS).to receive(:get).and_return('0')
+    allow(REDIS).to receive(:multi).and_yield
+    allow(REDIS).to receive(:incr)
+    allow(REDIS).to receive(:expire)
+  end
 end
 
 # Configure Shoulda Matchers

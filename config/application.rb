@@ -1,6 +1,7 @@
 require_relative "boot"
 
 require "rails/all"
+require "sprockets/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -14,7 +15,7 @@ module TinyApi
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[ssets task])
+    config.autoload_lib(ignore: %w[ assets tasks ])
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -27,6 +28,12 @@ module TinyApi
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
-    config.api_only = true
+    config.api_only = false  # Change this to false to enable asset pipeline
+
+    # Add this line to ensure Sprockets is properly initialized
+    config.assets.initialize_on_precompile = false
+    config.assets.compile = false
+    config.assets.precompile += %w[ manifest.js ]
+    config.public_file_server.enabled = true
   end
 end
