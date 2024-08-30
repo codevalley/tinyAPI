@@ -8,17 +8,20 @@ module RateLimitable
   private
 
   def check_rate_limit
-    key = "rate_limit:#{request.ip}:#{controller_name}:#{action_name}"
-    count = REDIS.get(key).to_i
+    current_count = REDIS.get(rate_limit_key).to_i
 
-    if count >= rate_limit
-      render json: { error: "Rate limit exceeded" }, status: :too_many_requests
-    else
-      REDIS.multi do
-        REDIS.incr(key)
-        REDIS.expire(key, 1.hour.to_i)
-      end
+    REDIS.multi do |pipeline|
+      pipeline.incr(rate_limit_key)
+      pipeline.expire(rate_limit_key, 1.hour.to_i)
     end
+
+    if current_count >= rate_limit
+      render json: { error: "Rate limit exceeded. Try again later." }, status: :too_many_requests
+    end
+  end
+
+  def rate_limit_key
+    "#{controller_name}:#{action_name}:#{request.ip}"
   end
 
   def rate_limit

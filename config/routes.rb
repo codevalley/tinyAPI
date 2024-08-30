@@ -1,3 +1,6 @@
+require "sidekiq/web"
+require "sidekiq-scheduler/web"
+
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -15,4 +18,7 @@ Rails.application.routes.draw do
   end
 
   resources :payloads, only: [ :index, :show, :create, :update ]
+
+  # Mount Sidekiq web interface
+  mount Sidekiq::Web => "/sidekiq"
 end

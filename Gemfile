@@ -54,5 +54,9 @@ gem "importmap-rails"
 group :test do
   gem "simplecov", require: false
   gem "simplecov-cobertura"
-  gem "fakeredis"
+  gem "fakeredis", "~> 0.8.0"
 end
+
+# Add these lines
+gem "sidekiq"
+gem "sidekiq-scheduler"

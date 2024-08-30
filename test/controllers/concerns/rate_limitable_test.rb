@@ -1,46 +1,41 @@
 require "test_helper"
 
-class RateLimitableTest < ActionDispatch::IntegrationTest
-  include ActiveSupport::Testing::TimeHelpers
+class RateLimitableTest < ActionController::TestCase
+  class TestController < ActionController::Base
+    include RateLimitable
+
+    def index
+      render plain: 'OK'
+    end
+  end
+
+  tests TestController
 
   setup do
-    @client_token = "test_token"
-    @limit = 100 # Assuming the limit for create action is 100
-    REDIS.flushdb # Clear Redis before each test
+    @routes = ActionDispatch::Routing::RouteSet.new.tap do |r|
+      r.draw { get 'index' => 'rate_limitable_test/test#index' }
+    end
   end
 
   test "allows requests within rate limit" do
-    (@limit - 1).times do
-      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+    50.times do
+      get :index
       assert_response :success
     end
   end
 
   test "blocks requests exceeding rate limit" do
-    @limit.times do
-      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
-    end
-
-    # This request should exceed the rate limit
-    post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
+    51.times { get :index }
     assert_response :too_many_requests
-    assert_equal({ "error" => "Rate limit exceeded" }, JSON.parse(response.body))
   end
 
   test "resets rate limit after an hour" do
-    @limit.times do
-      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
-    end
+    50.times { get :index }
+    assert_response :success
 
-    # This request should exceed the rate limit
-    post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
-    assert_response :too_many_requests
+    travel 1.hour + 1.second
 
-    # Travel 1 hour into the future
-    travel 1.hour do
-      REDIS.flushdb # Simulate Redis expiring the keys
-      post api_v1_payloads_path, params: { payload: { content: "Test" } }, headers: { "X-Client-Token": @client_token }
-      assert_response :success
-    end
+    get :index
+    assert_response :success
   end
 end

@@ -58,6 +58,13 @@ bundle exec rspec # check test coverage
 bundle exec rails test # check unit test coverage
 rails server # to locally start the server
 ```
+## Running service
+For local run you can use below command
+```bash
+rails server # to start the server
+bundle exec sidekiq # to start sidekiq
+```
+
 ## Deployment
 
 This project uses Kamal for deployment. Follow these steps to deploy:

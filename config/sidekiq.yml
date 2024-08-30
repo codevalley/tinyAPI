@@ -1,0 +1,4 @@
+:schedule:
+  delete_expired_payloads:
+    cron: '0 * * * *'  # Runs every hour
+    class: DeleteExpiredPayloadsJob

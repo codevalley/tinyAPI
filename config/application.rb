@@ -35,5 +35,8 @@ module TinyApi
     config.assets.compile = false
     config.assets.precompile += %w[ manifest.js ]
     config.public_file_server.enabled = true
+
+    # Use Sidekiq as the job queue adapter
+    config.active_job.queue_adapter = :sidekiq
   end
 end

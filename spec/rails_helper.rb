@@ -1,10 +1,11 @@
-# This file is copied to spec/ when you run "rails generate rspec:install"
-require "spec_helper"
-ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
+# This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'spec_helper'
+ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-require "rspec/rails"
+require 'rspec/rails'
+require 'fakeredis/rspec'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -67,10 +68,8 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   config.before(:each) do
-    allow(REDIS).to receive(:get).and_return('0')
-    allow(REDIS).to receive(:multi).and_yield
-    allow(REDIS).to receive(:incr)
-    allow(REDIS).to receive(:expire)
+    # This will use FakeRedis for all Redis operations in tests
+    Redis.instance_variable_set(:@data, Redis.new)
   end
 end
 
