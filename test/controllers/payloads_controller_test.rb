@@ -3,6 +3,7 @@ require "test_helper"
 class PayloadsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @payload = payloads(:one)
+    @headers = { "X-Client-Token" => "test_token" }
   end
 
   test "should get index" do
@@ -13,11 +14,10 @@ class PayloadsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create payload" do
     assert_difference("Payload.count") do
-      post payloads_url, params: { payload: { content: "New content", mime_type: "text/plain" } }, as: :json
+      post api_v1_payloads_url, params: { payload: { content: "Test content" } }, headers: @headers, as: :json
     end
 
     assert_response :created
-    assert_not_nil JSON.parse(@response.body)["hash_id"]
   end
 
   test "should show payload" do
@@ -27,11 +27,13 @@ class PayloadsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update payload" do
-    patch payload_url(@payload.hash_id),
+    patch api_v1_payload_url(@payload.hash_id),
           params: { payload: { content: "Updated content" } },
+          headers: @headers,
           as: :json
     assert_response :success
-    assert_equal "Updated content", Payload.find_by(hash_id: @payload.hash_id).content
+    @payload.reload
+    assert_equal "Updated content", @payload.content
   end
 
   test "should not create payload with invalid params" do

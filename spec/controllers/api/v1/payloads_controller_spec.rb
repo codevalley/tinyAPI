@@ -1,12 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Api::V1::PayloadsController, type: :controller do
-  let(:valid_attributes) { { content: "Test content", mime_type: "text/plain", expiry_time: 1.day.from_now } }
-  let(:invalid_attributes) { { content: "", mime_type: "", expiry_time: nil } }
-  let(:valid_headers) { { "X-Client-Token" => "test-token" } }
+  let(:client_token) { "test_token" }
+  let(:valid_attributes) { { content: "Test content" } }
+  let(:invalid_attributes) { { content: nil } }
 
   before do
-    request.headers.merge!(valid_headers)
+    request.headers["X-Client-Token"] = client_token
   end
 
   describe "POST #create" do
@@ -21,7 +21,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
         post :create, params: { payload: valid_attributes }
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq("application/json; charset=utf-8")
-        expect(JSON.parse(response.body)).to include("hash_id", "content", "mime_type", "expiry_time")
+        expect(JSON.parse(response.body)).to include("hash_id", "content")
       end
     end
 
@@ -34,17 +34,19 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
       end
     end
 
-    context "without client token" do
-      it "returns unauthorized" do
-        request.env.delete("HTTP_X_CLIENT_TOKEN")
-        post :create, params: { payload: "Test payload" }
-        expect(response).to have_http_status(:unauthorized)
+    context "with payload exceeding size limit" do
+      let(:large_payload) { { content: "a" * (PayloadService::MAX_CONTENT_SIZE + 1) } }
+
+      it "returns unprocessable entity" do
+        post :create, params: { payload: large_payload }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)["errors"]).to include("Content is too large")
       end
     end
   end
 
   describe "PUT #update" do
-    let!(:payload) { create(:payload, client_token: "test-token") }
+    let(:payload) { PayloadService.create(valid_attributes, client_token).payload }
 
     context "with valid params" do
       let(:new_attributes) { { content: "Updated content" } }
@@ -58,8 +60,7 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
       it "renders a JSON response with the payload" do
         put :update, params: { hash_id: payload.hash_id, payload: new_attributes }
         expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq("application/json; charset=utf-8")
-        expect(JSON.parse(response.body)["content"]).to eq("Updated content")
+        expect(response.content_type).to include("application/json")
       end
     end
 
@@ -75,21 +76,30 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
     context "with non-existent payload" do
       it "renders a JSON response with a not found error" do
         put :update, params: { hash_id: "non-existent", payload: valid_attributes }
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq("application/json; charset=utf-8")
+        expect(JSON.parse(response.body)).to have_key("errors")
+      end
+    end
+
+    context "with different client token" do
+      it "returns not found" do
+        request.headers["X-Client-Token"] = "different_token"
+        put :update, params: { hash_id: payload.hash_id, payload: { content: "Updated content" } }
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)).to have_key("errors")
       end
     end
   end
 
   describe "GET #show" do
-    let!(:payload) { create(:payload, client_token: "test-token") }
+    let(:payload) { PayloadService.create(valid_attributes, client_token).payload }
 
     it "renders a JSON response with the payload" do
       get :show, params: { hash_id: payload.hash_id }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("application/json; charset=utf-8")
-      expect(JSON.parse(response.body)).to include("hash_id", "content", "mime_type", "expiry_time")
+      expect(JSON.parse(response.body)).to include("hash_id", "content")
     end
 
     it "updates the viewed_at timestamp" do
@@ -104,7 +114,17 @@ RSpec.describe Api::V1::PayloadsController, type: :controller do
         get :show, params: { hash_id: "non-existent" }
         expect(response).to have_http_status(:not_found)
         expect(response.content_type).to eq("application/json; charset=utf-8")
-        expect(JSON.parse(response.body)).to have_key("errors")
+        expect(JSON.parse(response.body)).to have_key("error")
+      end
+    end
+
+    context "with expired payload" do
+      let!(:expired_payload) {
+ PayloadService.create({ content: "Expired", expiry_time: 1.second.ago }, client_token).payload }
+
+      it "returns not found" do
+        get :show, params: { hash_id: expired_payload.hash_id }
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

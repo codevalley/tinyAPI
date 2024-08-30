@@ -6,26 +6,30 @@ module Api
       before_action :set_client_token
 
       def create
-        @payload = PayloadService.create(payload_params, @client_token)
-        render json: @payload, status: :created
-      rescue ActiveRecord::RecordInvalid => e
-        render_error(e.message, :unprocessable_entity)
+        result = PayloadService.create(payload_params.merge(client_token: @client_token), @client_token)
+        if result.success?
+          render json: result.payload, status: :created
+        else
+          render json: { errors: result.errors }, status: :unprocessable_entity
+        end
       end
 
       def update
-        @payload = PayloadService.update(params[:hash_id], payload_params, @client_token)
-        render json: @payload
-      rescue ActiveRecord::RecordNotFound
-        render_error("Payload not found", :not_found)
-      rescue ActiveRecord::RecordInvalid => e
-        render_error(e.message, :unprocessable_entity)
+        result = PayloadService.update(params[:hash_id], payload_params, @client_token)
+        if result.success?
+          render json: result.payload
+        else
+          render json: { errors: result.errors }, status: :unprocessable_entity
+        end
       end
 
       def show
-        @payload = PayloadService.find(params[:hash_id], @client_token)
-        render json: @payload
-      rescue ActiveRecord::RecordNotFound
-        render_error("Payload not found", :not_found)
+        result = PayloadService.find(params[:hash_id], @client_token)
+        if result
+          render json: result
+        else
+          render json: { error: "Payload not found" }, status: :not_found
+        end
       end
 
       private
@@ -36,11 +40,7 @@ module Api
 
       def set_client_token
         @client_token = request.headers["X-Client-Token"]
-        render_error("Missing client token", :unauthorized) unless @client_token
-      end
-
-      def render_error(message, status)
-        render json: { errors: [ message ] }, status: status
+        render json: { error: "Missing client token" }, status: :unauthorized unless @client_token
       end
     end
   end

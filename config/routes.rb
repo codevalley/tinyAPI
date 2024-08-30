@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :payloads, only: [ :create, :update, :show ], param: :hash_id
+      resources :payloads, param: :hash_id, only: [ :create, :update, :show ]
     end
   end
 

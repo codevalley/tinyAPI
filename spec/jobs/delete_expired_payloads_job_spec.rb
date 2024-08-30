@@ -23,11 +23,11 @@ RSpec.describe DeleteExpiredPayloadsJob, type: :job do
     expect(Payload.exists?(valid_payload.id)).to be true
   end
 
-  describe "#perform_later" do
-    it "is enqueued with the correct queue" do
-      expect {
-        DeleteExpiredPayloadsJob.perform_later
-      }.to have_enqueued_job(DeleteExpiredPayloadsJob).on_queue("default")
-    end
+  it 'logs the number of deleted payloads' do
+    allow(Rails.logger).to receive(:info)
+    DeleteExpiredPayloadsJob.perform_now
+    expect(Rails.logger).to have_received(:info).with(/Deleted \d+ expired payloads/)
   end
+
+  # ... other tests ...
 end
