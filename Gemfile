@@ -54,5 +54,5 @@ gem "importmap-rails"
 group :test do
   gem "simplecov", require: false
   gem "simplecov-cobertura"
-  gem 'fakeredis'
+  gem "fakeredis"
 end

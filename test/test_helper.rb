@@ -23,10 +23,10 @@ end
 
 # Use FakeRedis for testing if available, otherwise use real Redis
 begin
-  require 'fakeredis/minitest'
+  require "fakeredis/minitest"
   puts "Using FakeRedis for testing"
 rescue LoadError
   puts "FakeRedis not available, using real Redis for testing"
-  require 'redis'
-  REDIS = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
+  require "redis"
+  REDIS = Redis.new(url: ENV["REDIS_URL"] || "redis://localhost:6379/1")
 end
