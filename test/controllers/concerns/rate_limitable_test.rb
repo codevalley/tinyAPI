@@ -5,7 +5,7 @@ class RateLimitableTest < ActionController::TestCase
     include RateLimitable
 
     def index
-      render plain: 'OK'
+      render plain: "OK"
     end
   end
 
@@ -13,7 +13,7 @@ class RateLimitableTest < ActionController::TestCase
 
   setup do
     @routes = ActionDispatch::Routing::RouteSet.new.tap do |r|
-      r.draw { get 'index' => 'rate_limitable_test/test#index' }
+      r.draw { get "index" => "rate_limitable_test/test#index" }
     end
   end
 
