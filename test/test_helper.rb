@@ -21,5 +21,12 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 end
 
-# Configure Redis for testing
-REDIS = Redis.new(url: ENV["REDIS_URL"] || "redis://localhost:6379/1")
+# Use FakeRedis for testing if available, otherwise use real Redis
+begin
+  require 'fakeredis/minitest'
+  puts "Using FakeRedis for testing"
+rescue LoadError
+  puts "FakeRedis not available, using real Redis for testing"
+  require 'redis'
+  REDIS = Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/1')
+end
