@@ -1,0 +1,63 @@
+# Name of your application. Used to uniquely configure containers.
+service: tinyapi
+
+# Name of the container image.
+image: ${DOCKER_USERNAME}/tinyapi
+
+# Deploy to these servers.
+servers:
+  web:
+    - ${DROPLET_IP}
+
+# Credentials for your image host.
+registry:
+  username: 
+    - ${DOCKER_USERNAME}
+  password: 
+    - ${DOCKER_PASSWORD}
+
+# Inject ENV variables into containers.
+env:
+  clear:
+    REDIS_URL: ${REDIS_URL}
+    DOMAIN: ${DOMAIN}
+  secret:
+    - RAILS_MASTER_KEY
+    - LETSENCRYPT_EMAIL
+
+# Use accessory services.
+accessories:
+  redis:
+    image: redis:7-alpine
+    host: ${DROPLET_IP}
+    port: 6379
+
+# Configure custom arguments for Traefik.
+traefik:
+  args:
+    entryPoints.web.address: ":80"
+    entryPoints.websecure.address: ":443"
+    certificatesResolvers.letsencrypt.acme.email: ${LETSENCRYPT_EMAIL}
+    certificatesResolvers.letsencrypt.acme.storage: "/letsencrypt/acme.json"
+    certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint: "web"
+  options:
+    publish:
+      - "443:443"
+    volume:
+      - "/letsencrypt:/letsencrypt"
+
+# Configure a custom healthcheck
+healthcheck:
+  path: /up
+  port: 3000
+
+asset_path: /rails/public
+
+boot:
+  limit: 25%
+  wait: 5
+
+ssh:
+  user: root
+  keys: 
+    - ${SSH_PRIVATE_KEY_PATH}

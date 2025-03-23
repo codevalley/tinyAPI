@@ -1,0 +1,22 @@
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - RAILS_ENV=test
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - redis
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:
+  bundle: 
